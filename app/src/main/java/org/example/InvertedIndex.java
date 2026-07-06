@@ -3,34 +3,35 @@
  */
 package org.example;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class InvertedIndex {
-   
-    Map<String, HashMap<String, Integer>> index = new HashMap<>();
 
-    public void addDocument(String docId, String content){
+    Map<String, HashMap<String, List<Integer>>> index = new HashMap<>();
+
+    public void addDocument(String docId, String content) {
         String[] contentSplit = content.toLowerCase().split(" ");
-        for (String string : contentSplit) {
-            HashMap<String, Integer> docsForWord = index.computeIfAbsent(string, key -> new HashMap<String, Integer>());
-            int count = docsForWord.containsKey(docId) ? docsForWord.get(docId) : 0;
-            docsForWord.put(docId, ++count);
+        for (int i = 0; i < contentSplit.length; i++) {
+            HashMap<String, List<Integer>> docsForWord = index.computeIfAbsent(contentSplit[i], key -> new HashMap<String, List<Integer>>());
+            docsForWord.computeIfAbsent(docId, k -> new ArrayList<>()).add(i);
         }
     }
 
-    public Map<String, Integer> search(String word){
+    public Map<String, List<Integer>> search(String word) {
         String wordLowerCase = word.toLowerCase();
         return index.containsKey(wordLowerCase) ? index.get(wordLowerCase) : new HashMap<>();
     }
 
     public int getCount(String word) {
-        
         int total = 0;
+
         String wordLowerCase = word.toLowerCase();
-        Map<String, Integer> getMap = search(wordLowerCase);
-        for (Integer count : getMap.values()) {
-            total+=count;
+        Map<String, List<Integer>> getMap = search(wordLowerCase);
+        for (List<Integer> positions : getMap.values()) {
+            total += positions.size();
         }
 
         return total;
