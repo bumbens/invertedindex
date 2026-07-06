@@ -20,6 +20,6 @@ public class InvertedIndexTest {
     @Test 
     public void addDocument() {
         classUnderTest.addDocument("doc1", "the dog eats");
-        assertTrue(classUnderTest.search("dog").contains("doc1"));
+        assertTrue(classUnderTest.search("dog").containsKey("doc1"));
     }
 }

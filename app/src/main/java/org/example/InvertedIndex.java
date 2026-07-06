@@ -4,35 +4,47 @@
 package org.example;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class InvertedIndex {
    
-    Map<String, HashSet<String>> index = new HashMap<>();
+    Map<String, HashMap<String, Integer>> index = new HashMap<>();
 
     public void addDocument(String docId, String content){
         String[] contentSplit = content.toLowerCase().split(" ");
         for (String string : contentSplit) {
-            HashSet<String> docsForWord = index.computeIfAbsent(string, key -> new HashSet<String>());
-            docsForWord.add(docId);
+            HashMap<String, Integer> docsForWord = index.computeIfAbsent(string, key -> new HashMap<String, Integer>());
+            int count = docsForWord.containsKey(docId) ? docsForWord.get(docId) : 0;
+            docsForWord.put(docId, ++count);
         }
     }
 
-    public Set<String> search(String word){
+    public Map<String, Integer> search(String word){
         String wordLowerCase = word.toLowerCase();
-        return index.containsKey(wordLowerCase) ? index.get(wordLowerCase) : new HashSet<>();
+        return index.containsKey(wordLowerCase) ? index.get(wordLowerCase) : new HashMap<>();
+    }
+
+    public int getCount(String word) {
+        
+        int total = 0;
+        String wordLowerCase = word.toLowerCase();
+        Map<String, Integer> getMap = search(wordLowerCase);
+        for (Integer count : getMap.values()) {
+            total+=count;
+        }
+
+        return total;
     }
 
     public static void main(String[] args) {
         InvertedIndex invertedIndex = new InvertedIndex();
-        
         invertedIndex.addDocument("doc1", "the cat sat");
         invertedIndex.addDocument("doc2", "the dog sat");
 
         System.out.println(invertedIndex.search("sat"));
         System.out.println(invertedIndex.search("cat"));
         System.out.println(invertedIndex.search("elephant"));
+
+        System.out.println(invertedIndex.getCount("sat"));
     }
 }
